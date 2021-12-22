@@ -5,7 +5,7 @@ keywords: limitcycle, spring, java
 author: limitcycle
 language: zh-TW
 timezone: Asia/Taipei
-url: http://example.com
+url: https://blog.limitcyclex.com
 permalink: ':year/:month/:day/:title/'
 permalink_defaults: null
 pretty_urls:
