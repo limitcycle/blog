@@ -1,5 +1,5 @@
 ---
-title: Keycloak授權服務
+title: '[Security]Keycloak授權服務'
 date: 2021-01-11 11:33:43
 tags: keycloak
 toc: true
@@ -155,7 +155,7 @@ Protection API提供的操作可以分為兩大類：
 
 ### 配置Keycloak
 
-基本配置內容可參閱[上篇文章]()
+基本配置內容可參閱[上篇文章](/2021/01/09/spring/spring-boot-with-keycloak)
 
 ### 建立Realm
 
