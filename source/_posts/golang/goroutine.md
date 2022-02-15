@@ -190,7 +190,7 @@ goroutine leak顧名思義就是goroutine一直佔用著資源，無法退出
 大部分的goroutine leak通常是`sync`、`channel`操作不當造成的，而且調用方無法控制此 goroutine 退出的方法
 > `sync`、`channel`造成 goroutine leak具體內容會在後續文章繼續探討
 
-簡單的範例： 
+簡單的範例：
 
 ```golang
 func main() {
@@ -397,10 +397,64 @@ xxxx/xx/xx xx:xx:xx timeout
 
 #### 補充
 
+方法二的改法，會有`goroutine`過多的問題。我們再多一個`stop` `channel`來避免這個問題。詳細代碼如下:
+
+```golang
+type Tracker struct {
+  ch   chan string
+  stop chan struct{}
+}
+
+func NewTracker() *Tracker {
+  return &Tracker{
+    ch: make(chan string, 10),
+  }
+}
+
+func (t *Tracker) Event(ctx context.Context, data string) error {
+  select {
+  case t.ch <- data:
+    return nil
+  case <-ctx.Done():
+    return ctx.Err()
+  }
+}
+
+func (t *Tracker) Run() {
+  for data := range t.ch {
+    time.Sleep(1 * time.Second)
+    fmt.Println(data)
+  }
+  t.stop <- struct{}{}
+}
+
+func (t *Tracker) Showdown(ctx context.Context) {
+  close(t.ch) //
+  select {
+  case <-t.stop:
+  case <-ctx.Done():
+  }
+}
+
+func main() {
+  tr := NewTracker()
+  go tr.Run()
+
+  _ = tr.Event(context.Background(), "1")
+  _ = tr.Event(context.Background(), "2")
+  _ = tr.Event(context.Background(), "3")
+
+  ctx, cancel := context.WithDeadline(context.Background(), time.Now().Add(5*time.Second))
+  defer cancel()
+
+  tr.Showdown(ctx)
+}
+```
+
 ## 總結
 
 1. 將使用 goroutine 的選擇權交給調用者
-2. 知道所使用的 goroutine 的生命週期(何時退出、如何退出)，避免 goroutine leak
+2. 知道所使用的 goroutine 的生命週期(何時開始、何時退出、控制如何退出)，避免 goroutine leak
 3. 調用 goroutine 請加上 `panic` `recovery`機制，避免整個服務直接退出
 4. **如果有大量請求，避免直接創建 goroutine處理**，應該使用`worker`模式來處理，可以避免調oom問題。若請求量很小的話，可以不用理會這個問題
 
