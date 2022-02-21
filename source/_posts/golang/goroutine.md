@@ -2,6 +2,7 @@
 title: '[Golang] Goroutine'
 date: 2022-02-07 03:51:01
 tags: golang
+categories: 學習
 toc: true
 cover: /images/golang/goroutine.jpeg
 ---

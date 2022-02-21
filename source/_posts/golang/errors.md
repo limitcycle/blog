@@ -2,6 +2,7 @@
 title: '[Golang] 錯誤處理'
 date: 2022-01-25 10:02:10
 tags: golang
+categories: 學習
 toc: true
 cover: /images/golang/error/error-cover.jpeg
 ---

@@ -2,6 +2,7 @@
 title: '[Middleware] 初探gRPC'
 date: 2022-01-11 13:47:01
 tags: middleware
+categories: 學習
 toc: true
 cover: /images/golang/grpc-icon-color.png
 ---

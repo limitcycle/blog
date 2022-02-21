@@ -2,6 +2,7 @@
 title: '[Other] 利用Netlify架設Blog'
 date: 2021-12-21 16:26:01
 tags: other
+categories: 學習
 toc: true
 cover: /images/other/use-netlify-building-blog/netlify_logo_icon_169924.png
 ---
