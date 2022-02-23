@@ -1,7 +1,7 @@
 ---
 title: '[golang] Memory Model'
 date: 2022-02-21 14:36:01
-tags: golan
+tags: golang
 categories: 學習
 toc: true
 # cover: /images/golang/grpc-icon-color.png
