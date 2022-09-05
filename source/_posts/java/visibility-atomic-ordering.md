@@ -96,3 +96,63 @@ OS做任務切換，可以發生在任何一條**CPU指令**執行完。沒錯�
 > 我們把一個或多個操作**在CPU執行的過程中不被中斷**的特性稱為`原子性`
 
 ## 源頭三: 編譯優化帶來的有序性問題
+
+編譯器為了優化效能，有時候會改變程式中的程式先後順序，讓我們看看下面例子:
+
+```java
+int x = 0;
+for (i = 0; i < 100;i++) {
+  x = 1;
+  System.out.println(x);
+}
+```
+
+在這段程式碼中，x在for循環裡重複被賦值了100次的1，但這簡直沒有必要。於是編譯器幫我們優化成下面的程式碼:
+
+```java
+int x = 1;
+for (i = 0; i < 100;i++) {
+  System.out.println(x);
+}
+```
+
+我們接著來看在Java領域中一個經典的案例，來看如果編譯器幫我們優化程式會發生什麼問題。
+
+單例模式的雙重檢查: 在getInstance()方法中，我們先判斷instance是否為null。如果是null，則鎖定Singleton.class並再次檢查instance是否為null，如果還是null則建立Singleton的一個實體。
+
+```java
+public class Singleton {
+  static Singleton instance;
+
+  static Singleton getInstance(){
+  if (instance == null) {
+    synchronized(Singleton.class) {
+      if (instance == null)
+        instance = new Singleton();
+      }
+    }
+    return instance;
+  }
+}
+```
+
+假設有兩個Tread A、B同時調用getInstance()方法，會同時發現instance==null，於是同時對Singleton.class加鎖，此時JVM能保證只有一個Thread能加鎖成功(假設是Thread A)，另一條Thread就會處於等待狀態。接著Thread A會建立一個Singleton實體，之後釋放鎖。鎖釋放後，Thread B被喚醒，然後嘗試加鎖，此時可以加鎖成功，Thread B接著檢查instance == null會發現已經有Singleton實體了，所以Thread B就不會再建立一個Singleton實體了。
+
+理論上這一切都很完美，但是實際上getInstance()方法卻有遐疵。
+問題出在new操作上，我們以為的new操作是：
+
+1. 分配一塊記憶體M
+2. 在記憶體M上初始化Singleton物件
+3. 然後將M的地址賦值給instance變數
+
+然而實際優化過的執行路徑卻是如下：
+
+1. 分配一塊記憶體M
+2. 將M的地址賦值給instance變數
+3. 最後在記憶體M上初始化Singleton物件
+
+優化後會產生什麼問題？我們假設Thread A先執行getInstance()方法，當執行完指令2時，剛好發生Thread切換到Thread B，如果此時Thread B執行getInstance()方法時，Thread B會判斷到`instance != null`，所以直接返回instance，但是此時的instance是還沒有初始化過的。如果我們現在使用instance就發生NullPointerException。
+
+## 結語
+
+## 參考資料
