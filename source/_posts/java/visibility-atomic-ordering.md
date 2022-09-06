@@ -12,6 +12,8 @@ toc: true
 
 那為什麼併發程式會很容易出問題？它又是怎麼出現問題的？今天就讓我們聊聊這些問題吧!
 
+<!-- more -->
+
 ## 併發程式背後的故事
 
 CPU、Memory、IO設備在這些年內不斷的迭代更新。但是在這快速發展的過程中，有一個**核心矛盾一直存在，就是這三者的速度差異**。
@@ -77,7 +79,7 @@ public class Test {
 
 由於IO太慢，早期的OS就發明了Multi-Processing，即便在單核CPU上我們也可以一邊聽著歌，一邊寫程式，這個就是Multi-Processing的功勞。
 
-OS允許某一個某個Process執行一小段時間，例如50毫秒，過了50毫秒OS就會重新選擇一個Process來執行(俗稱:[任務切換Task Switching](https://www.google.com/search?q=task+switching&sxsrf=ALiCzsZKjINUT38m12OdeXM8IOougYYNUg%3A1662187581049&ei=PfgSY5LUAuCJr7wPhOak8A0&oq=task+sw&gs_lcp=Cgdnd3Mtd2l6EAEYADIFCAAQgAQyBQgAEIAEMgUIABCABDIFCAAQgAQyBQgAEIAEMgUIABCABDIFCAAQgAQyBQgAEIAEMgUIABCABDIFCAAQgAQ6CggAEEcQ1gQQsAM6DgguEIAEELEDEMcBEK8BOgUILhCABDoHCCMQ6gIQJzoECCMQJzoLCAAQgAQQsQMQgwE6EQguEIAEELEDEIMBEMcBENEDOgsILhCABBCxAxCDAToICAAQgAQQsQM6BAgAEEM6DgguEIAEELEDEMcBENEDOggILhCxAxCDAToLCC4QsQMQgwEQ1AI6CAguEIAEELEDOhEILhCABBCxAxCDARDHARCvAToKCAAQsQMQgwEQQzoLCC4QgAQQxwEQ0QNKBAhBGABKBAhGGABQ5QhY9hhgvitoAnABeACAAcIBiAHmCZIBAzAuOZgBAKABAbABCsgBCrgBA8ABAQ&sclient=gws-wiz))，這個50毫秒稱為[時間片](https://zh.wikipedia.org/zh-tw/%E6%97%B6%E9%97%B4%E7%89%87)。
+OS允許某一個某個Process執行一小段時間，例如50毫秒，過了50毫秒OS就會重新選擇一個Process來執行(俗稱:[任務切換Task Switching](https://en.wikipedia.org/wiki/Task_switching_(psychology))，這個50毫秒稱為[時間片](https://zh.wikipedia.org/zh-tw/%E6%97%B6%E9%97%B4%E7%89%87)。
 
 Java的併發程式都是基於多執行緒的，自然也會涉及到任務切換，但這也是會產生bug的源頭之一。
 
@@ -153,6 +155,16 @@ public class Singleton {
 
 優化後會產生什麼問題？我們假設Thread A先執行getInstance()方法，當執行完指令2時，剛好發生Thread切換到Thread B，如果此時Thread B執行getInstance()方法時，Thread B會判斷到`instance != null`，所以直接返回instance，但是此時的instance是還沒有初始化過的。如果我們現在使用instance就發生NullPointerException。
 
+![單例模式的雙重檢查異常執行路徑](/images/java/concurrentcy/visibility-atomic-ordering/order-problem.jpg)
+
 ## 結語
 
+以上在介紹可見性、原子性、有序性時，特地介紹**CPU快取**帶來的可見性問題，**Thread切換**帶來的原子性問題，**編譯優化**帶來的有序性問題，其實CPU快取、Thread切換以及編譯優化的目的都是提高效能。技術解決一個問題，同時也帶來了一個新的問題，所以在**採用一項技術的同時，一定要清楚它帶來的問題是什麼，以及如何規避**。
+
 ## 參考資料
+
+- <https://time.geekbang.org/column/159>(01)
+- <https://www.jianshu.com/p/45885e50d1c4>
+- <https://zh.wikipedia.org/zh-tw/%E5%88%86%E6%99%82%E7%B3%BB%E7%B5%B1>
+- <https://en.wikipedia.org/wiki/Task_switching_(psychology)>
+- <https://zh.wikipedia.org/zh-tw/%E5%88%86%E6%99%82%E7%B3%BB%E7%B5%B1>
