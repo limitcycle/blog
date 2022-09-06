@@ -1,5 +1,5 @@
 ---
-title: '[golang] Memory Model'
+title: '[Golang] Memory Model'
 date: 2022-02-21 14:36:01
 tags: golang
 categories: 學習
