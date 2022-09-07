@@ -18,7 +18,7 @@ toc: true
 
 CPU、Memory、IO設備在這些年內不斷的迭代更新。但是在這快速發展的過程中，有一個**核心矛盾一直存在，就是這三者的速度差異**。
 
-> 速度差異(快&rarr;慢)： CPU > Memory > IO
+> 速度差異(快到慢)： CPU > Memory > IO
 
 為了合理利用CPU的高性能，平衡這三者的速度差異，電腦體系結構、OS、程式編譯器都做出了貢獻，主要體現為：
 
@@ -91,7 +91,7 @@ Java的併發程式都是基於多執行緒的，自然也會涉及到任務切�
 
 OS做任務切換，可以發生在任何一條**CPU指令**執行完。沒錯，是CPU指令，而不是高級語言裡的一條語句。對於上面的三條指令來說，對於上面的三條指令來說，我們假設count=0，如果Thread A在指令1執行完做任務切換，Thread A和Thread B按照下圖的順序執行，那麼我們會發現兩個Thread都執行了count+=1的操作，但是得到的結果不是我們所預期的2，而是1。
 
-![非原子操作的執行路徑示意圖](/images/java/concurrentcy/visibility-atomic-ordering/cpu-cache.png)
+![非原子操作的執行路徑示意圖](/images/java/concurrentcy/visibility-atomic-ordering/thread-switch.jpg)
 
 我們的直覺會覺得count+=1這個操作是一個不可分割的整體，就像一個原子一樣，Thread的切換可以發生在count+=1之前，也可以發生在count+=1之後，但就是不會發生在中間。
 
