@@ -60,5 +60,10 @@ include: null
 exclude: null
 ignore: null
 theme: icarus
+
+# Mermaid diagrams (handled by custom script)
+mermaid:
+  enable: true
+
 deploy:
   type: ''
